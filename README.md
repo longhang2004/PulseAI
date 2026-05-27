@@ -141,8 +141,18 @@ app.listen(8081, () => {
 
 ## Supported LLM Providers
 
-| Provider | Model (Recommended) | Configuration | Self-Hostable |
-|---|---|---|---|
-| **Anthropic** | `claude-3-5-sonnet` | `LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY` | No |
-| **OpenAI** | `gpt-4o` | `LLM_PROVIDER=openai`, `OPENAI_API_KEY` | No |
-| **Ollama** | `llama3:8b` | `LLM_PROVIDER=ollama`, `OLLAMA_ENDPOINT` | Yes |
+You can select the LLM provider by setting `LLM_PROVIDER` in your environment. You can also customize the model name for any provider using environment overrides:
+
+| Provider | Env Provider Select | Config API Key / URL | Default Model | Model Override Env |
+|---|---|---|---|---|
+| **Anthropic** | `LLM_PROVIDER=anthropic` | `ANTHROPIC_API_KEY` | `claude-3-5-sonnet-20241022` | `ANTHROPIC_MODEL` |
+| **OpenAI** | `LLM_PROVIDER=openai` | `OPENAI_API_KEY` | `gpt-4o` | `OPENAI_MODEL` |
+| **Gemini** | `LLM_PROVIDER=gemini` | `GEMINI_API_KEY` | `gemini-1.5-flash` | `GEMINI_MODEL` |
+| **Ollama** | `LLM_PROVIDER=ollama` | `OLLAMA_ENDPOINT` | `llama3` | `OLLAMA_MODEL` |
+
+### Gemini Example (Gemini 2.5 Flash)
+```bash
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
+```
