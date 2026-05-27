@@ -23,7 +23,7 @@ PulseAI is an open-source, production observability platform that ingests logs, 
                              [ Ingest Gateway ]  (Port 3000 - NestJS/Fastify)
                                      |
                                      v
-                              [ Kafka Broker ]   (Port 9092)
+                             [ Kafka Broker ]   (Port 9092)
                                      |
                                      v
                             [ Stream Processor ]  (Port 8080 - Java Spring Boot)
@@ -36,7 +36,10 @@ PulseAI is an open-source, production observability platform that ingests logs, 
                                                  v
                                         [ Diagnosis Service ]  (Port 3001 - NestJS)
                                                  |
-                                                 +---> Anthropic Claude / OpenAI
+                                                 +---> Anthropic Claude / OpenAI / Ollama
+                                                 |
+                                                 v
+                                         [ Alert Service ]  (Port 3002 - NestJS)
                                                  |
                                                  v
                                          [ API Service ]  (Port 3003 - NestJS)
@@ -70,17 +73,69 @@ pnpm dev:infra
 ```
 
 ### 2. Run Application Services
-Start the Node services and Next.js frontend concurrently:
+Start all the monorepo services and the Next.js frontend concurrently:
 ```bash
 pnpm dev:services
 ```
-Alternatively, start individual services locally or compile them using the workspace filters:
-*   Ingest Gateway: `pnpm --filter ingest-gateway run dev` (Port 3000)
-*   Stream Processor: `mvn -pl services/stream-processor spring-boot:run` (Port 8080)
-*   Diagnosis Service: `pnpm --filter diagnosis-service run dev` (Port 3001)
-*   Alert Service: `pnpm --filter alert-service run dev` (Port 3002)
-*   API Service: `pnpm --filter api-service run dev` (Port 3003)
-*   Frontend: `pnpm --filter frontend run dev` (Port 4000)
+
+#### Monorepo Port Reference:
+*   **Ingest Gateway:** Port `3000` (NestJS Fastify)
+*   **Stream Processor:** Port `8080` (Spring Boot Java)
+*   **Diagnosis Service:** Port `3001` (NestJS) - AI processing
+*   **Alert Service:** Port `3002` (NestJS) - Slack, email, webhook routing
+*   **API Service:** Port `3003` (NestJS) - Query engine & WebSockets
+*   **Frontend Dashboard:** Port `4000` (Next.js 16 / App Router / Tailwind CSS v4)
+
+---
+
+## PulseAI Integration SDK
+
+Inject telemetry collection into your Node/Express applications using our lightweight integration client.
+
+### Installation
+Add the SDK to your server application dependencies:
+```bash
+npm install axios uuid
+```
+
+### Usage Example
+Import and hook the SDK into Winston loggers and Express routes:
+
+```typescript
+import express from 'express';
+import winston from 'winston';
+import { PulseAISDK } from './packages/pulseai-sdk';
+
+const app = express();
+
+// 1. Initialize the SDK
+const pulseAI = new PulseAISDK({
+  apiKey: 'YOUR_PROJECT_API_KEY',
+  streamId: 'api-service-production',
+  ingestUrl: 'http://localhost:3000/ingest'
+});
+
+// 2. Register Winston logger transport
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.Console(),
+    pulseAI.getWinstonTransport() // Redirects error/info logs to PulseAI Ingestion Gateway
+  ]
+});
+
+// 3. Register Express trace middleware
+app.use(pulseAI.getExpressMiddleware()); // Automatically traces request latency & routes
+
+app.get('/api/users', (req, res) => {
+  logger.info('Fetching user records');
+  res.json([{ id: 1, name: 'Alice' }]);
+});
+
+app.listen(8081, () => {
+  logger.info('App listening on port 8081');
+});
+```
 
 ---
 
@@ -91,10 +146,3 @@ Alternatively, start individual services locally or compile them using the works
 | **Anthropic** | `claude-3-5-sonnet` | `LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY` | No |
 | **OpenAI** | `gpt-4o` | `LLM_PROVIDER=openai`, `OPENAI_API_KEY` | No |
 | **Ollama** | `llama3:8b` | `LLM_PROVIDER=ollama`, `OLLAMA_ENDPOINT` | Yes |
-
----
-
-## Roadmap
-1.  **GitHub Actions Integration:** Auto-ingest CI/CD logs to diagnose build failures.
-2.  **Kubernetes Operator:** Native metrics/events adapter.
-3.  **Slack App:** Native interactive alerts with inline re-diagnose actions.

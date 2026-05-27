@@ -7,6 +7,8 @@ web_modules/
 # Next.js Build
 .next/
 out/
+dist/
+build/
 
 # Java Spring Boot & Maven Build
 target/

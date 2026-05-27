@@ -5,23 +5,31 @@ This file maintains project context and state across agent sessions, acting as t
 ---
 
 ## Current Status
-- **Phase:** Phase 2 (Stream Processor - Spring Boot) - COMPLETED
-- **Active Task:** Handover for Phase 3 (Diagnosis Service - NestJS).
-- **Last Updated:** 2026-05-27T08:50:00Z (Phase 2 Completed)
+- **Phase:** Phase 6 (Ingestion SDK & Documentation) - COMPLETED
+- **Active Task:** Verification walkthrough complete, monorepo fully active.
+- **Last Updated:** 2026-05-27T16:00:00Z (All Phases Completed)
 
 ---
 
 ## Architectural Decisions
 1.  **Monorepo:** Configured as a pnpm monorepo using workspace packages under `services/*`, `frontend`, and `sdk`.
 2.  **Telemetry Data Schema:** Locked down the schemas for `LOG`, `METRIC`, and `TRACE` in `CLAUDE.md`. All services must adhere to this.
-3.  **Port Mapping:** Confirmed standard ports to prevent port conflicts (Ingest = 3000, Stream Processor = 8080, Diagnosis = 3001, Alert = 3002, API = 3003, Frontend = 4000).
+3.  **Port Mapping:** Confirmed standard ports to prevent port conflicts:
+    *   Ingest Gateway = 3000
+    *   Stream Processor = 8080
+    *   Diagnosis Service = 3001
+    *   Alert Service = 3002
+    *   API Service = 3003
+    *   Frontend Dashboard = 4000
 4.  **Database Integration:** Selected TimescaleDB PG16 for time-series signal storage, partition key `timestamp`, 7-day retention.
-5.  **Java Spring Boot (Java 17 fallback):** System environment runs OpenJDK 17. Concurrency models in `stream-processor` will be adapted to be Java 17-compatible by default, but ready for Java 21 Virtual Threads when requested.
+5.  **Custom SVG Charts:** Opted for custom SVG lines and bars inside Next.js 16 to avoid hydration, type, or styling mismatch conflicts with external chart wrappers.
+6.  **Redis Idempotency Locks:** Idempotency checking for alerts uses `pulseai:alert-sent:<ruleId>:<incidentId>` in Redis (10-minute expiry NX) to ensure alerts are never duplicated.
 
 ---
 
 ## Fixed Issues & Lessons Learned
-- *No bugs or fixes recorded yet.*
+- **Typeorm ioredis set parameters:** `redis.set` signatures in TypeScript for ioredis require expiry arguments in strict order (`EX`, `time`, `NX`), otherwise it throws a parameter overload match error.
+- **Ajv Type Guards:** For NestJS Ajv validation payload verification, JSON types are narrowed to `unknown`. Cast values explicitly (e.g. `(signal as any).timestamp`) to satisfy TS checks.
 
 ---
 
@@ -51,3 +59,24 @@ This file maintains project context and state across agent sessions, acting as t
 - Created `WindowRecoveryService` to populate sliding windows from TimescaleDB at startup.
 - Created `AutoResolutionService` to resolve incidents via Redis count locks after 3 checks.
 - Wrote JUnit 5 tests covering detector thresholds and standard deviation spikes.
+
+### 2026-05-27 (Session 4 - Diagnosis Service)
+- Implemented `services/diagnosis-service` (NestJS) fully.
+- Collected TimescaleDB evidence around 5-minute incident window.
+- Scrubber clusters errors using regex and parses Java/Node stack traces.
+- Built self-contained dynamic Circuit Breaker class (3 failures -> opens LLM connection).
+- Handled playbooks auto-fallbacks on circuit breaker breach.
+- Added re-diagnosis rate limit (5-minute cooldown Redis key).
+
+### 2026-05-27 (Session 5 - Alert & API Services)
+- Implemented `services/alert-service` (NestJS) for rules evaluation and notifier routing.
+- Coded `ConditionEvaluator` supporting severity scales and stream/type filters.
+- Built `NotifierService` carrying Slack Block Kit, SendGrid templates, and webhook posts.
+- Implemented `services/api-service` (NestJS) query service running cursor-based pagination and raw SQL `time_bucket('5 minutes')` averages/percentiles.
+- Programmed Socket.io gateway broadcasting real-time incidents to project rooms.
+
+### 2026-05-27 (Session 6 - Frontend & SDK)
+- Scaffolded dependencies in `frontend` (Next.js 16 + Tailwind CSS v4).
+- Added `socket.ts` and custom SVG latency/error charts.
+- Wrote `LoginView` and `DashboardView` coordinating drawer details, alert rule builders, and feedback loops.
+- Programmed Winston Log Transport and Express middleware tracking in `packages/pulseai-sdk.ts`.
