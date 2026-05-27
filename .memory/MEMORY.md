@@ -5,9 +5,9 @@ This file maintains project context and state across agent sessions, acting as t
 ---
 
 ## Current Status
-- **Phase:** Phase 0 (Project Bootstrap & Scaffolding) - COMPLETED
-- **Active Task:** Handover for Phase 1 (Ingest Gateway implementation).
-- **Last Updated:** 2026-05-27T08:34:00Z (Bootstrap Completed)
+- **Phase:** Phase 1 (Ingest Gateway Implementation) - COMPLETED
+- **Active Task:** Handover for Phase 2 (Stream Processor - Spring Boot).
+- **Last Updated:** 2026-05-27T08:44:00Z (Phase 1 Completed)
 
 ---
 
@@ -30,3 +30,13 @@ This file maintains project context and state across agent sessions, acting as t
 - Created root configurations: `pnpm-workspace.yaml`, `package.json`, `.gitignore`, `.env.example`.
 - Created Docker configurations: `docker-compose.yml`, `docker-compose.dev.yml`.
 - Established agent workflow configurations: `CLAUDE.md`, `.memory/MEMORY.md`, `.skills/observability-skills.md`, `codegraph.config.json`, `.rtk.toml`.
+
+### 2026-05-27 (Session 2 - Ingest Gateway)
+- Implemented `services/ingest-gateway` fully.
+- Set up API Key Authentication Guard with Redis cache (5m TTL).
+- Set up sliding window Rate Limiter Guard with Redis Lua script (10,000 signals/min).
+- Integrated Ajv validation schemas for LOG, METRIC, and TRACE signals.
+- Configured KafkaJS Producer with fire-and-forget (acks: 0) publishing.
+- Implemented Stream Tracker and 60-second Cron database flusher.
+- Created `load-test.js` script and documented results in `LOAD_TEST.md`.
+- Wrote Jest unit tests for ValidationService and verified successful test runs.
