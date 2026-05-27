@@ -5,9 +5,9 @@ This file maintains project context and state across agent sessions, acting as t
 ---
 
 ## Current Status
-- **Phase:** Phase 1 (Ingest Gateway Implementation) - COMPLETED
-- **Active Task:** Handover for Phase 2 (Stream Processor - Spring Boot).
-- **Last Updated:** 2026-05-27T08:44:00Z (Phase 1 Completed)
+- **Phase:** Phase 2 (Stream Processor - Spring Boot) - COMPLETED
+- **Active Task:** Handover for Phase 3 (Diagnosis Service - NestJS).
+- **Last Updated:** 2026-05-27T08:50:00Z (Phase 2 Completed)
 
 ---
 
@@ -40,3 +40,14 @@ This file maintains project context and state across agent sessions, acting as t
 - Implemented Stream Tracker and 60-second Cron database flusher.
 - Created `load-test.js` script and documented results in `LOAD_TEST.md`.
 - Wrote Jest unit tests for ValidationService and verified successful test runs.
+
+### 2026-05-27 (Session 3 - Stream Processor)
+- Implemented `services/stream-processor` (Java Spring Boot) fully.
+- Created Flyway migration `V1__create_signals_table.sql` setting up TimescaleDB hypertables, indexes, and retention policies.
+- Set up composite primary key JPA mappings (`SignalId` + `SignalEntity` + `@JdbcTypeCode(SqlTypes.JSON)`).
+- Implemented concurrent `@KafkaListener` consumers for logs, metrics, and traces.
+- Created `StreamStats` tracking rolling sliding windows and a reservoir sampler for latency.
+- Implemented anomaly detectors (error rate, error burst, metric standard deviation, trace failures, and silence).
+- Created `WindowRecoveryService` to populate sliding windows from TimescaleDB at startup.
+- Created `AutoResolutionService` to resolve incidents via Redis count locks after 3 checks.
+- Wrote JUnit 5 tests covering detector thresholds and standard deviation spikes.
