@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Overrides for local development with volume mounts
+  ingest-gateway:
+    command: pnpm run start:dev
+    volumes:
+      - ./services/ingest-gateway:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+
+  stream-processor:
+    volumes:
+      - ./services/stream-processor:/usr/src/app
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+
+  diagnosis-service:
+    command: pnpm run start:dev
+    volumes:
+      - ./services/diagnosis-service:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+
+  alert-service:
+    command: pnpm run start:dev
+    volumes:
+      - ./services/alert-service:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+
+  api-service:
+    command: pnpm run start:dev
+    volumes:
+      - ./services/api-service:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+
+  frontend:
+    command: pnpm run dev
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    environment:
+      - NODE_ENV=development

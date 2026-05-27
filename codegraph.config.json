@@ -1,0 +1,21 @@
+{
+  "include": [
+    "services/**/*",
+    "frontend/**/*",
+    "sdk/**/*"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/target/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/.git/**"
+  ],
+  "languages": ["typescript", "java"],
+  "dbPath": ".codegraph/db.sqlite",
+  "mcp": {
+    "enabled": true,
+    "port": 8515
+  }
+}

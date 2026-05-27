@@ -1,0 +1,6 @@
+packages:
+  - 'services/ingest-gateway'
+  - 'services/diagnosis-service'
+  - 'services/alert-service'
+  - 'services/api-service'
+  - 'frontend'

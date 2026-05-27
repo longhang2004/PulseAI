@@ -1,0 +1,21 @@
+{
+  "name": "pulseai-monorepo",
+  "version": "1.0.0",
+  "description": "Production Observability Platform with AI-Powered Diagnosis",
+  "private": true,
+  "scripts": {
+    "dev:infra": "docker compose up -d",
+    "dev:infra:down": "docker compose down",
+    "dev:services": "pnpm --parallel -r run dev",
+    "dev": "pnpm dev:infra && pnpm dev:services",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "codegraph:init": "npx @colbymchenry/codegraph init",
+    "codegraph:index": "npx @colbymchenry/codegraph",
+    "skills:install": "npx antigravity-awesome-skills"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

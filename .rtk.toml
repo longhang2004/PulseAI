@@ -1,0 +1,27 @@
+# RTK (Rust Token Killer) Configuration
+
+[global]
+enabled = true
+cache_dir = ".rtk_cache"
+compression_level = "aggressive"  # options: standard, aggressive, extreme
+
+[rules]
+strip_whitespace = true
+collapse_repeated_lines = true
+remove_interactive_ansi = true
+
+[commands]
+# --- Maven / Spring Boot build compression rules ---
+"mvn" = { strip_success_logs = true, filter_dependencies = true, max_output_lines = 150 }
+"mvnw" = { strip_success_logs = true, filter_dependencies = true, max_output_lines = 150 }
+
+# --- npm / pnpm command rules ---
+"npm" = { filter_warnings = true, hide_audit_notices = true }
+"pnpm" = { filter_warnings = true, hide_audit_notices = true }
+
+# --- Git status and log compression ---
+"git" = { strip_untracked_files_hints = true, collapse_diff_whitespace = true }
+
+# --- Docker & Docker Compose ---
+"docker" = { collapse_duplicate_logs = true, max_log_lines = 200 }
+"docker-compose" = { collapse_duplicate_logs = true, max_log_lines = 200 }

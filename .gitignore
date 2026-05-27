@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+jspm_packages/
+web_modules/
+
+# Next.js Build
+.next/
+out/
+
+# Java Spring Boot & Maven Build
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+.metadata/
+.classpath
+.project
+.settings/
+bin/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Docker
+docker/data/
+
+# IDE / Editor config
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Agent / Tool Memory & Cache
+.memory/private/
+.codegraph/
+.rtk_cache/
+*.log
