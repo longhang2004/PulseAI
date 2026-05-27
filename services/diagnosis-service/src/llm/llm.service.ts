@@ -45,7 +45,7 @@ export class LlmService {
       throw new InternalServerErrorException('Anthropic API key is not configured');
     }
 
-    const model = 'claude-3-5-sonnet-20241022';
+    const model = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
     const response = await firstValueFrom(
       this.httpService.post(
         'https://api.anthropic.com/v1/messages',
@@ -78,7 +78,7 @@ export class LlmService {
       throw new InternalServerErrorException('OpenAI API key is not configured');
     }
 
-    const model = 'gpt-4o';
+    const model = process.env.OPENAI_MODEL || 'gpt-4o';
     const response = await firstValueFrom(
       this.httpService.post(
         'https://api.openai.com/v1/chat/completions',
@@ -111,7 +111,7 @@ export class LlmService {
       throw new InternalServerErrorException('Gemini API key is not configured');
     }
 
-    const model = 'gemini-1.5-flash';
+    const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
     const response = await firstValueFrom(
       this.httpService.post(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiKey}`,
@@ -141,7 +141,7 @@ export class LlmService {
   }
 
   private async callOllama(prompt: string) {
-    const model = 'llama3';
+    const model = process.env.OLLAMA_MODEL || 'llama3';
     const response = await firstValueFrom(
       this.httpService.post(
         `${this.ollamaEndpoint}/api/chat`,
