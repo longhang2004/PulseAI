@@ -9,6 +9,7 @@ export class LlmService {
   private readonly provider: string;
   private readonly anthropicKey: string;
   private readonly openAiKey: string;
+  private readonly geminiKey: string;
   private readonly ollamaEndpoint: string;
 
   constructor(private readonly httpService: HttpService) {
@@ -17,6 +18,7 @@ export class LlmService {
     this.provider = process.env.LLM_PROVIDER || 'anthropic';
     this.anthropicKey = process.env.ANTHROPIC_API_KEY || '';
     this.openAiKey = process.env.OPENAI_API_KEY || '';
+    this.geminiKey = process.env.GEMINI_API_KEY || '';
     this.ollamaEndpoint = process.env.OLLAMA_ENDPOINT || 'http://localhost:11434';
   }
 
@@ -29,6 +31,8 @@ export class LlmService {
       return this.callAnthropic(prompt);
     } else if (this.provider === 'openai') {
       return this.callOpenAi(prompt);
+    } else if (this.provider === 'gemini' || this.provider === 'google') {
+      return this.callGemini(prompt);
     } else if (this.provider === 'ollama') {
       return this.callOllama(prompt);
     } else {
@@ -98,6 +102,40 @@ export class LlmService {
     const text = body.choices?.[0]?.message?.content || '';
     const inputTokens = body.usage?.prompt_tokens;
     const outputTokens = body.usage?.completion_tokens;
+
+    return { text, model, inputTokens, outputTokens };
+  }
+
+  private async callGemini(prompt: string) {
+    if (!this.geminiKey) {
+      throw new InternalServerErrorException('Gemini API key is not configured');
+    }
+
+    const model = 'gemini-1.5-flash';
+    const response = await firstValueFrom(
+      this.httpService.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiKey}`,
+        {
+          contents: [{
+            parts: [{ text: prompt }]
+          }],
+          generationConfig: {
+            responseMimeType: 'application/json'
+          }
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 10000,
+        }
+      )
+    );
+
+    const body = response.data;
+    const text = body.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const inputTokens = body.usageMetadata?.promptTokenCount;
+    const outputTokens = body.usageMetadata?.candidatesTokenCount;
 
     return { text, model, inputTokens, outputTokens };
   }
